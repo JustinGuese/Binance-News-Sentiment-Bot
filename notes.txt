@@ -1,0 +1,4 @@
+the sentiment for BTC is: -0.09
+the sentiment for ETH is: 0.00
+the sentiment for BNB is: 0.10
+the sentiment for LTC is: 0.32

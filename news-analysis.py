@@ -34,8 +34,8 @@ from binance.enums import *
 from binance.exceptions import BinanceAPIException, BinanceOrderException
 
 # used for binance websocket
-from binance.websockets import BinanceSocketManager
-from twisted.internet import reactor
+# from binance.websockets import BinanceSocketManager
+# from twisted.internet import reactor
 
 # used for executing the code
 from itertools import count
@@ -79,10 +79,13 @@ if testnet:
 keywords = {
     'XRP': ['ripple', 'xrp', 'XRP', 'Ripple', 'RIPPLE'],
     'BTC': ['BTC', 'bitcoin', 'Bitcoin', 'BITCOIN'],
-    'XLM': ['Stellar Lumens', 'XLM'],
-    #'BCH': ['Bitcoin Cash', 'BCH'],
-    'ETH': ['ETH', 'Ethereum'],
-    'BNB' : ['BNB', 'Binance Coin'],
+    'XLM': ['Stellar Lumens', 'XLM', 'Stellar', 'stellar'],
+    'Cardano' : ["Cardano", "ADA", "cardano", "ada"],
+    "Dogecoin" : ["Doge","doge", "Dogecoin", "dogecoin", "DOGE", "DOGECOIN"],
+    "Polkadot" : ["polkadot", "polkadot", "POLKADOT", "polka", "DOT" "dot"],
+    'BCH': ['Bitcoin Cash', 'BCH', "bitcoin cash", "BITCOIN CASH"],
+    'ETH': ['ETH', 'Ethereum','Ethereum', 'ethereum', 'ethereum', 'ETHEREUM'],
+    'BNB' : ['BNB', 'Binance Coin', 'binance coin', 'Binance', 'binance', 'bnb'],
     'LTC': ['LTC', 'Litecoin']
     }
 
@@ -103,7 +106,7 @@ NEGATIVE_SENTIMENT_THRESHOLD = 0
 # define the minimum number of articles that need to be analysed in order
 # for the sentiment analysis to qualify for a trade signal
 # avoid using 1 as that's not representative of the overall sentiment
-MINUMUM_ARTICLES = 1
+MINUMUM_ARTICLES = 5
 
 # define how often to run the code (check for new + try to place trades)
 # in minutes
@@ -111,7 +114,7 @@ REPEAT_EVERY = 60
 
 # define how old an article can be to be included
 # in hours
-HOURS_PAST = 24
+HOURS_PAST = 48 # 24
 
 
 ############################################
@@ -156,10 +159,10 @@ def ticker_socket(msg):
 
 
 # connect to the websocket client and start the socket
-bsm = BinanceSocketManager(client)
-for coin in keywords:
-    conn_key = bsm.start_symbol_ticker_socket(coin+PAIRING, ticker_socket)
-bsm.start()
+# bsm = BinanceSocketManager(client)
+# for coin in keywords:
+#     conn_key = bsm.start_symbol_ticker_socket(coin+PAIRING, ticker_socket)
+# bsm.start()
 
 
 '''For the amount of CRYPTO to trade in USDT'''
@@ -362,6 +365,7 @@ def compile_sentiment():
 def compound_average():
     '''Calculates and returns the average compoud sentiment for each coin'''
     compiled_sentiment = compile_sentiment()
+    print("why is this shit not working?!?")
     headlines_analysed = {}
 
     for coin in compiled_sentiment:
@@ -372,6 +376,7 @@ def compound_average():
 
         # get the mean
         compiled_sentiment[coin] = np.mean(compiled_sentiment[coin])
+        print("the sentiment for %s is: %.2f" % (coin, compiled_sentiment[coin]))
 
         # convert to scalar
         compiled_sentiment[coin] = compiled_sentiment[coin].item()
@@ -503,6 +508,7 @@ def save_coins_in_hand_to_file():
 if __name__ == '__main__':
     print('Press Ctrl-Q to stop the script')
     for i in count():
+        print("test of printing")
         compiled_sentiment, headlines_analysed = compound_average()
         print("\nBUY CHECKS:")
         buy(compiled_sentiment, headlines_analysed)
